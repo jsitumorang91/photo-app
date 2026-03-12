@@ -1,0 +1,7 @@
+node_modules/
+uploads/*
+!.gitkeep
+.DS_Storenode_modules/
+uploads/*
+!.gitkeep
+.DS_Store
