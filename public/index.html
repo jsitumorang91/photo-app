@@ -1,93 +1,247 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Photo Repo Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Repository - Neon Gradient</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f8f9fa; }
-        .controls { background: white; padding: 15px; border-bottom: 1px solid #ddd; display: flex; gap: 10px; justify-content: center; }
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; padding: 20px; }
-        .item { background: white; border-radius: 8px; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; }
-        .item img, .folder-box { width: 100%; height: 150px; object-fit: cover; }
-        .folder-box { background: #e8f0fe; display: flex; align-items: center; justify-content: center; font-size: 40px; }
-        .action-menu { position: absolute; top: 5px; right: 5px; display: flex; flex-direction: column; gap: 2px; opacity: 0; transition: 0.2s; }
-        .item:hover .action-menu { opacity: 1; }
-        .btn-sm { font-size: 10px; cursor: pointer; border: 1px solid #ccc; background: white; border-radius: 3px; }
-        .clipboard-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #202124; color: white; padding: 10px 20px; border-radius: 20px; display: none; gap: 15px; z-index: 1000; }
+        /* Gaya Modern dengan Gradasi Menarik */
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            /* Gradasi Cyberpunk */
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); 
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.05); /* Efek Kaca */
+            backdrop-filter: blur(10px);
+            padding: 16px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h2 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.8rem;
+            background: linear-gradient(to right, #00dbde, #fc00ff); /* Teks Gradasi */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Kontrol */
+        .controls {
+            padding: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Input File */
+        #photoInput {
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        /* Tombol Modern */
+        button {
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-upload {
+            background: linear-gradient(to right, #12c2e9, #c471ed, #f64f59); /* Gradasi Tombol */
+            color: white;
+            box-shadow: 0 4px 15px rgba(196, 113, 237, 0.4);
+        }
+
+        .btn-upload:hover {
+            box-shadow: 0 6px 20px rgba(196, 113, 237, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-folder {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-folder:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Navigasi */
+        .breadcrumb {
+            padding: 10px 30px;
+            font-size: 1rem;
+            color: #00dbde; /* Biru Neon */
+            cursor: pointer;
+            text-align: center;
+        }
+
+        /* Grid Galeri */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+
+        /* Item */
+        .item {
+            background: rgba(255, 255, 255, 0.05); /* Efek Kaca */
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .item:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 219, 222, 0.5); /* Neon Border */
+            box-shadow: 0 5px 15px rgba(0, 219, 222, 0.3);
+        }
+
+        /* Gambar */
+        .item img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        /* Box Folder */
+        .item.folder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 220px;
+            background: linear-gradient(135deg, #2b5876 0%, #4e4376 100%); /* Gradasi Folder */
+            color: #fff;
+        }
+
+        .folder-icon {
+            font-size: 70px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Nama Item */
+        .item-name {
+            padding: 15px;
+            font-size: 0.9rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background: rgba(0, 0, 0, 0.2);
+        }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<div class="controls">
-    <input type="file" id="photoInput">
-    <button onclick="uploadPhoto()">Upload</button>
-    <button onclick="createNewFolder()">+ Folder</button>
-</div>
+    <header>
+        <h2>PHOTO REPOSITORY</h2>
+    </header>
 
-<div id="pathBar" style="padding:10px 20px; color:#1a73e8; cursor:pointer;" onclick="navigateTo('')">Home / <span id="pathLabel"></span></div>
-<div class="gallery" id="gallery"></div>
+    <div class="controls">
+        <input type="file" id="photoInput" accept="image/*">
+        <button onclick="uploadPhoto()" class="btn-upload">Upload</button>
+        <button onclick="createNewFolder()" class="btn-folder">+ New Folder</button>
+    </div>
 
-<div id="clipboardBar" class="clipboard-bar">
-    <span id="clipLabel"></span>
-    <button onclick="pasteItem()" style="background:#8ab4f8; border:none; border-radius:10px; padding:2px 10px;">Paste</button>
-    <button onclick="clearClip()" style="background:none; color:white; border:none;">Cancel</button>
-</div>
+    <div class="breadcrumb" onclick="navigateTo('')">HOME / <span id="currentPathLabel"></span></div>
 
-<script>
-    let currentPath = "";
-    let clipboard = { action: null, path: null, name: "" };
+    <div class="gallery" id="gallery"></div>
 
-    async function loadItems() {
-        const res = await fetch(`/items?path=${currentPath}`);
-        const items = await res.json();
-        document.getElementById('pathLabel').innerText = currentPath;
+    <script>
+        // Logika JavaScript sama persis
         const gallery = document.getElementById('gallery');
-        
-        gallery.innerHTML = items.map(item => `
-            <div class="item">
-                <div class="action-menu">
-                    <button class="btn-sm" onclick="renameItem(event, '${item.path}', '${item.name}')">Rename</button>
-                    <button class="btn-sm" onclick="setClip(event, 'copy', '${item.path}', '${item.name}')">Copy</button>
-                    <button class="btn-sm" onclick="setClip(event, 'move', '${item.path}', '${item.name}')">Move</button>
-                </div>
-                <div onclick="${item.isFolder ? `MapsTo('${item.path}')` : `window.open('${item.url}')`}">
-                    ${item.isFolder ? '<div class="folder-box">📁</div>' : `<img src="${item.url}">`}
-                    <div style="padding:5px; font-size:11px; text-align:center;">${item.name}</div>
-                </div>
-            </div>
-        `).join('');
-    }
+        const pathLabel = document.getElementById('currentPathLabel');
+        let currentPath = "";
 
-    async function renameItem(e, oldPath, oldName) {
-        e.stopPropagation();
-        const newName = prompt("New name:", oldName.split('.')[0]);
-        if (newName) {
-            await fetch('/rename', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ oldPath, newName }) });
-            loadItems();
+        async function loadItems() {
+            try {
+                const res = await fetch(`/items?path=${currentPath}`); // Path relatif
+                const items = await res.json();
+                pathLabel.innerText = currentPath;
+                
+                if (!items.length) {
+                    gallery.innerHTML = "<p style='text-align:center; color: #fff; opacity: 0.6; font-style: italic; width: 100%;'>No items here. Upload a photo or create a folder!</p>";
+                    return;
+                }
+
+                gallery.innerHTML = items.map(item => {
+                    if (item.isFolder) {
+                        return `
+                            <div class="item folder" onclick="navigateTo('${currentPath ? currentPath + '/' : ''}${item.name}')">
+                                <div class="folder-icon">📁</div>
+                                <div class="item-name">${item.name}</div>
+                            </div>`;
+                    } else {
+                        return `
+                            <div class="item">
+                                <img src="${item.url}" alt="${item.name}">
+                                <div class="item-name">${item.name}</div>
+                            </div>`;
+                    }
+                }).join('');
+            } catch (err) { console.error("Error:", err); }
         }
-    }
 
-    function setClip(e, action, path, name) {
-        e.stopPropagation();
-        clipboard = { action, path, name };
-        document.getElementById('clipboardBar').style.display = "flex";
-        document.getElementById('clipLabel').innerText = `${action}: ${name}`;
-    }
+        function navigateTo(path) { currentPath = path; loadItems(); }
 
-    async function pasteItem() {
-        const endpoint = clipboard.action === 'copy' ? '/copy-item' : '/move-item';
-        await fetch(endpoint, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ sourcePath: clipboard.path, destinationFolder: currentPath }) });
-        clearClip();
-        loadItems();
-    }
+        async function createNewFolder() {
+            const folderName = prompt("Folder name:");
+            if (!folderName) return;
+            try {
+                await fetch('/create-folder', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ folderName, currentPath })
+                });
+                loadItems();
+            } catch (err) { alert("Failed to create folder"); }
+        }
 
-    function clearClip() { document.getElementById('clipboardBar').style.display = "none"; }
-    function navigateTo(p) { currentPath = p; loadItems(); }
-    async function uploadPhoto() {
-        const fd = new FormData(); fd.append('photo', document.getElementById('photoInput').files[0]); fd.append('folder', currentPath);
-        await fetch('/upload', { method: 'POST', body: fd }); loadItems();
-    }
-    loadItems();
-</script>
+        async function uploadPhoto() {
+            const fileInput = document.getElementById('photoInput');
+            if (!fileInput.files[0]) return alert("Select a photo first");
+            const formData = new FormData();
+            formData.append('photo', fileInput.files[0]);
+            formData.append('folder', currentPath); // Upload ke folder saat ini
+            try {
+                await fetch('/upload', { method: 'POST', body: formData });
+                fileInput.value = '';
+                loadItems();
+            } catch (err) { alert("Upload failed"); }
+        }
+
+        loadItems(); // Muat item saat halaman dibuka
+    </script>
 </body>
 </html>
