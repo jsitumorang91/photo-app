@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// 1. Create New Folder
+// Create Folder
 app.post('/create-folder', (req, res) => {
     const { folderName, currentPath } = req.body;
     const newPath = path.join(UPLOADS_DIR, currentPath || '', folderName);
@@ -36,23 +36,42 @@ app.post('/create-folder', (req, res) => {
     }
 });
 
-// 2. Upload Photo to specific folder
+// Delete Item (File or Folder)
+app.delete('/delete', (req, res) => {
+    const { itemPath } = req.body;
+    const fullPath = path.join(UPLOADS_DIR, itemPath);
+    
+    if (fs.existsSync(fullPath)) {
+        if (fs.lstatSync(fullPath).isDirectory()) {
+            fs.rmSync(fullPath, { recursive: true, force: true });
+        } else {
+            fs.unlinkSync(fullPath);
+        }
+        res.json({ success: true });
+    } else {
+        res.status(404).json({ error: "Item not found" });
+    }
+});
+
 app.post('/upload', upload.single('photo'), (req, res) => {
     res.json({ success: true });
 });
 
-// 3. Get Items (Files & Folders)
 app.get('/items', (req, res) => {
     const subFolder = req.query.path || '';
     const directoryPath = path.join(UPLOADS_DIR, subFolder);
     
     fs.readdir(directoryPath, { withFileTypes: true }, (err, files) => {
         if (err) return res.status(500).send("Unable to scan directory");
-        const items = files.map(file => ({
-            name: file.name,
-            isFolder: file.isDirectory(),
-            url: file.isDirectory() ? null : `/uploads/${subFolder ? subFolder + '/' : ''}${file.name}`
-        }));
+        // FIX: Added filter to hide hidden files like .gitkeep
+        const items = files
+            .filter(file => !file.name.startsWith('.')) 
+            .map(file => ({
+                name: file.name,
+                isFolder: file.isDirectory(),
+                url: file.isDirectory() ? null : `/uploads/${subFolder ? subFolder + '/' : ''}${file.name}`,
+                path: subFolder ? `${subFolder}/${file.name}` : file.name
+            }));
         res.json(items);
     });
 });
