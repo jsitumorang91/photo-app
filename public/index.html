@@ -1,48 +1,195 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Repo Publik</title>
+    <title>Photo Repo Publik - Modern</title>
+    <link rel="icon" type="image/png" href="https://www.google.com/images/branding/product/2x/photos_64dp.png">
     <style>
-        body { font-family: sans-serif; text-align: center; background: #f4f4f4; margin: 0; }
-        .upload-section { background: white; padding: 20px; border-bottom: 1px solid #ddd; }
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding: 20px; }
-        .gallery img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; }
-        button { padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        /* Gaya Google Photos Putih Bersih */
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f8f9fa; 
+            text-align: center; 
+        }
+
+        /* Header Gaya Google */
+        header {
+            background-color: rgb(255, 255, 255);
+            color: #5f6368;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 2px rgba(60,64,67,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h2 {
+            margin: 0;
+            font-weight: 400;
+            font-size: 1.5rem;
+        }
+
+        /* Bagian Upload */
+        .upload-section {
+            background-color: white;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(60,64,67,0.1);
+            margin-bottom: 24px;
+        }
+
+        /* Input File & Tombol */
+        #photoInput {
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 12px;
+            background: #f8f9fa;
+            cursor: pointer;
+            margin-right: 12px;
+            color: #5f6368;
+        }
+
+        button.upload-btn {
+            background-color: #1a73e8; /* Biru Google */
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        button.upload-btn:hover {
+            background-color: #1557b0;
+        }
+
+        /* Grid Galeri yang Luas */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Gambar lebih besar */
+            gap: 12px;
+            padding: 24px;
+        }
+
+        /* Gambar Galeri */
+        .gallery img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover; /* Crop agar rapi */
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 1px 2px rgba(60,64,67,0.1);
+        }
+
+        /* Efek Hover Gambar */
+        .gallery img:hover {
+            transform: scale(1.03); /* Membesar sedikit */
+            box-shadow: 0 4px 8px rgba(60,64,67,0.2);
+            z-index: 1;
+        }
+
+        /* Gaya Tombol Bawaan Input File (Safari/Chrome) */
+        input[type="file"]::-webkit-file-upload-button {
+            border: none;
+            background: none;
+            color: #1a73e8;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Gaya untuk status loading */
+        #uploadStatus {
+            margin-top: 8px;
+            color: #5f6368;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
-    <div class="upload-section">
+
+    <header>
         <h2>My Photo Repository</h2>
+        <img src="https://www.google.com/images/branding/product/2x/photos_96dp.png" alt="Google Photos" height="32px">
+    </header>
+
+    <div class="upload-section">
+        <h2>Tambahkan Foto Baru</h2>
         <input type="file" id="photoInput" accept="image/*">
-        <button onclick="uploadPhoto()">Upload Photo</button>
+        <button onclick="uploadPhoto()" class="upload-btn">Upload Foto</button>
+        <p id="uploadStatus"></p>
     </div>
+
     <div class="gallery" id="gallery"></div>
 
     <script>
         const gallery = document.getElementById('gallery');
+        const uploadStatus = document.getElementById('uploadStatus');
 
+        // Mengambil foto menggunakan URL Relatif agar kompatibel di internet
         async function loadPhotos() {
             try {
-                const res = await fetch('/photos'); // Memanggil API internal server
+                const res = await fetch('/photos'); // Memanggil endpoint backend
                 const data = await res.json();
-                gallery.innerHTML = data.map(p => `<img src="${p.url}">`).join('');
-            } catch (err) { console.error("Error load:", err); }
+                
+                if (!data.length) {
+                    gallery.innerHTML = "<p style='color: #5f6368; font-style: italic;'>Galeri kosong. Coba upload foto!</p>";
+                    return;
+                }
+
+                gallery.innerHTML = data.map(p => `
+                    <img src="${p.url}" alt="Foto Galeri" title="Klik untuk memperbesar">
+                `).join('');
+
+                // Opsional: Tambahkan lightbox atau fungsi zoom di sini
+            } catch (err) {
+                console.error("Error memuat foto:", err);
+                gallery.innerHTML = "<p style='color: #d93025;'>Gagal memuat galeri. Cek log server.</p>";
+            }
         }
 
+        // Fungsi Upload
         async function uploadPhoto() {
             const fileInput = document.getElementById('photoInput');
-            if (!fileInput.files[0]) return alert("Pilih foto dulu");
+            
+            if (!fileInput.files[0]) {
+                alert("Pilih file foto terlebih dahulu.");
+                return;
+            }
 
             const formData = new FormData();
             formData.append('photo', fileInput.files[0]);
 
+            uploadStatus.innerText = "Mengupload..."; // Tampilkan status
+
             try {
-                await fetch('/upload', { method: 'POST', body: formData });
-                fileInput.value = '';
-                loadPhotos();
-            } catch (err) { alert("Upload gagal"); }
+                const response = await fetch('/upload', { method: 'POST', body: formData }); // Memanggil endpoint backend
+                
+                if (!response.ok) {
+                    throw new Error("Pesan dari server: Gagal upload");
+                }
+
+                uploadStatus.innerText = "Berhasil diupload!";
+                uploadStatus.style.color = "#188038";
+                fileInput.value = ''; // Reset input
+                loadPhotos(); // Refresh galeri
+
+                // Hapus status setelah beberapa detik
+                setTimeout(() => {
+                    uploadStatus.innerText = "";
+                    uploadStatus.style.color = "#5f6368";
+                }, 3000);
+
+            } catch (err) {
+                alert(err.message || "Upload gagal.");
+                uploadStatus.innerText = "";
+            }
         }
 
         loadPhotos();
