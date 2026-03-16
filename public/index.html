@@ -2,345 +2,140 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Repo Pro - Neon Edition</title>
+    <title>BITbyBIT Neon Storage</title>
     <style>
-        /* --- ESTETIKA NEON LIGHT BARU DENGAN GAMBAR BELAKANG --- */
         body { 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            /* Integrasi Gambar Latar Belakang BITbyBIT */
-            background: linear-gradient(rgba(15, 32, 39, 0.8), rgba(44, 83, 100, 0.9)), url('https://image.onrender.com/jsitumorang91/photo-app/image_f42b88.png') no-repeat center center fixed; 
-            background-size: cover;
-            color: #fff;
-            min-height: 100vh;
+            margin: 0; background: #0a0a0a url('https://image.onrender.com/jsitumorang91/photo-app/image_f42b88.png') no-repeat center center fixed; 
+            background-size: cover; color: white; font-family: sans-serif; 
         }
+        .overlay { background: rgba(0,0,0,0.7); min-height: 100vh; padding: 20px; }
+        header { border-bottom: 2px solid #8cc63f; padding-bottom: 10px; text-align: center; text-shadow: 0 0 10px #8cc63f; }
+        
+        .controls { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
+        button { background: #8cc63f; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 5px; }
+        button:hover { box-shadow: 0 0 15px #8cc63f; }
 
-        /* Header Gaya Neon (Transparan & Cahaya) */
-        header {
-            background-color: rgba(20, 20, 25, 0.05); 
-            backdrop-filter: blur(5px);
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-bottom: 2px solid #8cc63f; /* Hijau BITbyBIT */
-            
-            /* Cahaya Neon Hijau pada Header */
-            box-shadow: 0 0 15px rgba(140, 198, 63, 0.6); 
-            position: sticky; top: 0; z-index: 100;
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .item { background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); border-radius: 10px; padding: 10px; position: relative; text-align: center; }
+        .item img { width: 100%; height: 150px; object-fit: cover; border-radius: 5px; }
+        .folder-icon { font-size: 60px; cursor: pointer; }
+        
+        .actions { position: absolute; top: 5px; right: 5px; display: none; background: rgba(0,0,0,0.8); padding: 5px; border-radius: 5px; }
+        .item:hover .actions { display: flex; flex-direction: column; gap: 5px; }
+        .btn-small { font-size: 10px; padding: 5px; background: #333; color: white; }
+
+        #pasteBar { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            background: #8cc63f; color: black; padding: 15px; border-radius: 50px; 
+            display: none; gap: 15px; align-items: center; box-shadow: 0 0 20px #8cc63f;
         }
-
-        header h2 {
-            margin: 0; font-weight: 500; font-size: 1.6rem;
-            color: #fff;
-            /* Cahaya Neon pada Teks */
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.9), 0 0 10px rgba(140, 198, 63, 0.7); 
-        }
-
-        /* Bagian Kontrol (Upload & Folder) */
-        .controls {
-            padding: 24px;
-            display: flex; gap: 12px;
-            justify-content: center; align-items: center; flex-wrap: wrap;
-        }
-
-        /* Input File Modern */
-        #photoInput {
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 12px;
-            background: rgba(20, 20, 25, 0.6);
-            color: #fff;
-            cursor: pointer;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-
-        #photoInput:hover {
-            border-color: #8cc63f;
-            box-shadow: 0 0 10px rgba(140, 198, 63, 0.5);
-        }
-
-        /* Tombol Gaya Neon */
-        button {
-            border: none; padding: 14px 28px; border-radius: 8px;
-            cursor: pointer; font-size: 1rem; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 1px;
-            transition: all 0.3s ease;
-            background-color: #f1f3f4; /* Putih */
-            color: #5f6368;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-        }
-
-        button:hover {
-            background-color: #fff; 
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 25px rgba(140, 198, 63, 0.5); 
-            transform: translateY(-2px);
-        }
-
-        button.btn-neon {
-            background-color: #8cc63f; /* Hijau BITbyBIT */
-            color: #000;
-        }
-
-        button.btn-neon:hover {
-            background-color: #ade84f;
-            box-shadow: 0 0 15px rgba(140, 198, 63, 0.9), 0 0 25px rgba(140, 198, 63, 0.7); 
-        }
-
-        /* Navigasi (Breadcrumb) - Neon Teal */
-        .breadcrumb {
-            padding: 10px 24px; font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
-            cursor: pointer; text-align: center;
-        }
-
-        /* Grid Galeri yang Luas */
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 16px; padding: 24px;
-        }
-
-        /* Item Galeri (Efek Kaca Gelap) */
-        .item {
-            background-color: rgba(25, 25, 30, 0.1); 
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .item:hover {
-            transform: scale(1.03) translateY(-3px);
-            border-color: rgba(140, 198, 63, 0.5); 
-            box-shadow: 0 5px 15px rgba(140, 198, 63, 0.3), 0 0 25px rgba(140, 198, 63, 0.2); 
-        }
-
-        /* Gambar */
-        .item img {
-            width: 100%; height: 200px; object-fit: cover;
-        }
-
-        /* Box Folder (Gradasi Lime/Teal dari Logo) */
-        .item.folder {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 200px;
-            background: linear-gradient(135deg, rgba(140, 198, 63, 0.3) 0%, rgba(0, 150, 136, 0.3) 100%); 
-            color: #fff;
-        }
-
-        .folder-icon { font-size: 60px; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
-
-        /* Informasi Item (Nama Teks) */
-        .item-name {
-            padding: 10px; font-size: 0.9rem; text-align: center; font-weight: 500;
-            color: rgba(255, 255, 255, 0.9);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        /* --- NEW: Menu Aksi Item (Rename/Delete/Copy/Move) --- */
-        .item-actions {
-            position: absolute; bottom: 35px; right: 5px;
-            display: flex; gap: 3px;
-            opacity: 0; /* Sembunyikan default */
-            transition: opacity 0.2s;
-        }
-
-        .item:hover .item-actions { opacity: 1; }
-
-        .btn-mini {
-            font-size: 10px; padding: 4px 8px;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid #dadce0; border-radius: 4px;
-            cursor: pointer; color: #3c4043;
-        }
-
-        .btn-mini:hover { background: #fff; }
-        .btn-delete { color: #d93025; }
-
-        /* Panel Menempel/Batal (Neon Lime) */
-        #pasteBar {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(140, 198, 63, 0.9); 
-            backdrop-filter: blur(10px);
-            color: #000; padding: 15px 30px;
-            border-radius: 30px; display: none; gap: 20px;
-            align-items: center; font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 200;
-        }
-
-        /* Modal Preview Gambar (Lightbox) */
-        #previewModal {
-            display: none; position: fixed; z-index: 1000;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            align-items: center; justify-content: center;
-        }
-
-        #previewModal img { max-width: 95%; max-height: 95%; border: 3px solid #fff; border-radius: 4px; }
     </style>
 </head>
 <body>
-
-    <header>
-        <h2>BITbyBIT Photo Manager Pro</h2>
-    </header>
+<div class="overlay">
+    <header><h1>BITbyBIT Photo Manager</h1></header>
 
     <div class="controls">
-        <input type="file" id="photoInput" accept="image/*">
-        <button onclick="uploadPhoto()" class="btn-neon">Upload Photo</button>
-        <button onclick="createNewFolder()">+ Folder Baru</button>
+        <input type="file" id="photoInput">
+        <button onclick="uploadPhoto()">Upload</button>
+        <button onclick="addFolder()">+ Folder</button>
     </div>
 
-    <div class="breadcrumb" onclick="navigateTo('')">Home / <span id="currentPathLabel"></span></div>
+    <div id="breadcrumb" style="margin-bottom: 20px; cursor: pointer; color: #8cc63f;" onclick="goHome()">Home / <span id="pathDisplay"></span></div>
 
     <div class="gallery" id="gallery"></div>
 
     <div id="pasteBar">
-        <span id="clipInfo"></span>
-        <button onclick="executePaste()" class="btn-neon" style="color:#fff; padding: 8px 15px; text-transform: none; border-radius: 15px;">Paste Di Sini</button>
-        <button onclick="clearClipboard()" style="background:none; border:none; color:#000; cursor:pointer;">Cancel</button>
+        <span id="clipText"></span>
+        <button onclick="pasteItem()" style="background: white;">Paste Here</button>
+        <button onclick="cancelClip()" style="background: #ff4444; color: white;">X</button>
     </div>
+</div>
 
-    <div id="previewModal" onclick="this.style.display='none'">
-        <img id="previewImg" src="">
-    </div>
+<script>
+    let currentPath = "";
+    let clipboard = null;
 
-    <script>
+    async function loadItems() {
+        const res = await fetch(`/items?path=${currentPath}`);
+        const items = await res.json();
+        document.getElementById('pathDisplay').innerText = currentPath;
         const gallery = document.getElementById('gallery');
-        const pathLabel = document.getElementById('currentPathLabel');
-        const pasteBar = document.getElementById('pasteBar');
-        const clipInfo = document.getElementById('clipInfo');
-        const previewModal = document.getElementById('previewModal');
-        const previewImg = document.getElementById('previewImg');
+        gallery.innerHTML = items.map(item => `
+            <div class="item">
+                <div class="actions">
+                    <button class="btn-small" onclick="prepAction('copy', '${item.path}', '${item.name}')">Copy</button>
+                    <button class="btn-small" onclick="prepAction('move', '${item.path}', '${item.name}')">Move</button>
+                    <button class="btn-small" onclick="renameItem('${item.path}', '${item.name}')">Rename</button>
+                    <button class="btn-small" style="color:red" onclick="deleteItem('${item.path}')">Del</button>
+                </div>
+                ${item.isFolder ? `<div class="folder-icon" onclick="enterFolder('${item.path}')">📁</div>` : `<img src="${item.url}">`}
+                <div style="margin-top:5px; font-size:12px;">${item.name}</div>
+            </div>
+        `).join('');
+    }
 
-        let currentPath = "";
-        let clipboard = { action: null, sourcePath: null, name: "" }; // Menyimpan data copy/cut
+    function enterFolder(path) { currentPath = path; loadItems(); }
+    function goHome() { currentPath = ""; loadItems(); }
 
-        async function loadItems() {
-            try {
-                const res = await fetch(`/items?path=${currentPath}`); // Menggunakan path relatif
-                const items = await res.json();
-                pathLabel.innerText = currentPath;
-                
-                if (!items.length) {
-                    gallery.innerHTML = "<p style='text-align:center; color: #fff; opacity: 0.6; font-style: italic; width: 100%;'>Gallery empty. Upload a photo or create a folder!</p>";
-                    return;
-                }
+    function prepAction(action, path, name) {
+        clipboard = { action, path, name };
+        document.getElementById('clipText').innerText = `${action.toUpperCase()}: ${name}`;
+        document.getElementById('pasteBar').style.display = 'flex';
+    }
 
-                gallery.innerHTML = items.map(item => `
-                    <div class="item">
-                        <div class="item-actions">
-                            <button class="btn-mini" onclick="renameItem(event, '${item.path}', '${item.name}')">Rename</button>
-                            <button class="btn-mini btn-delete" onclick="deleteItem(event, '${item.path}')">🗑</button>
-                            ${!item.isFolder ? `
-                                <button class="btn-mini" onclick="prepareClip(event, 'copy', '${item.path}', '${item.name}')">Copy</button>
-                                <button class="btn-mini" onclick="prepareClip(event, 'move', '${item.path}', '${item.name}')">Move</button>
-                            ` : ''}
-                        </div>
+    async function pasteItem() {
+        await fetch('/transfer', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ action: clipboard.action, source: clipboard.path, destFolder: currentPath })
+        });
+        cancelClip(); loadItems();
+    }
 
-                        <div onclick="${item.isFolder ? `MapsTo('${item.path}')` : `openPreview('${item.url}')`}">
-                            ${item.isFolder ? '<div class="folder-box folder-icon">📁</div>' : `<img src="${item.url}" alt="${item.name}">`}
-                            <div class="item-name">${item.name}</div>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (err) { console.error("Error:", err); }
-        }
+    function cancelClip() { document.getElementById('pasteBar').style.display = 'none'; clipboard = null; }
 
-        // --- NEW: Copy & Paste / Move Logic (Frontend Support) ---
+    async function renameItem(path, oldName) {
+        const newName = prompt("Nama baru:", oldName);
+        if (!newName) return;
+        await fetch('/rename', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ oldPath: path, newName })
+        });
+        loadItems();
+    }
 
-        // Prepare Action (Move item data to clipboard)
-        function prepareClip(event, action, path, name) {
-            event.stopPropagation(); // Mencegah preview
-            clipboard = { action, sourcePath: path, name };
-            pasteBar.style.display = 'flex';
-            clipInfo.innerText = `${action.toUpperCase()}ING: ${name}`;
-        }
+    async function addFolder() {
+        const name = prompt("Nama folder:");
+        if (!name) return;
+        await fetch('/create-folder', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ name, path: currentPath })
+        });
+        loadItems();
+    }
 
-        async function executePaste() {
-            const endpoint = clipboard.action === 'copy' ? '/copy-item' : '/move-item';
-            try {
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ 
-                        sourcePath: clipboard.sourcePath, 
-                        destinationFolder: currentPath // Tempel ke folder saat ini
-                    })
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Pesan dari server: Gagal ${clipboard.action}`);
-                }
-                
-                clearClipboard();
-                loadItems();
-            } catch (err) { alert(err.message || "Aksi gagal."); }
-        }
+    async function deleteItem(path) {
+        if (!confirm("Hapus?")) return;
+        await fetch('/delete', {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ path })
+        });
+        loadItems();
+    }
 
-        function clearClipboard() {
-            clipboard = { action: null, sourcePath: null, name: "" };
-            pasteBar.style.display = 'none';
-        }
+    async function uploadPhoto() {
+        const file = document.getElementById('photoInput').files[0];
+        if (!file) return;
+        const fd = new FormData(); fd.append('photo', file); fd.append('folder', currentPath);
+        await fetch('/upload', { method: 'POST', body: fd });
+        loadItems();
+    }
 
-
-        // --- FILE MANAGEMENT FUNCTIONS (FIXED BACKEND SUPPORT) ---
-
-        async function createNewFolder() {
-            const name = prompt("Nama folder baru:");
-            if (name) {
-                await fetch('/create-folder', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ folderName: name, currentPath })
-                });
-                loadItems();
-            }
-        }
-
-        // Rename (Fixed: Handles extensions correctly on backend)
-        async function renameItem(event, oldPath, oldName) {
-            event.stopPropagation(); // Prevent preview/open
-            const newName = prompt("Masukkan nama baru (tanpa ekstensi):", oldName.split('.').slice(0, -1).join('.'));
-            if (!newName) return;
-            await fetch('/rename', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ oldPath, newName })
-            });
-            loadItems();
-        }
-
-        async function deleteItem(event, itemPath) {
-            event.stopPropagation();
-            if (!confirm("Apakah Anda yakin ingin menghapus item ini?")) return;
-            await fetch('/delete', {
-                method: 'DELETE',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ itemPath })
-            });
-            loadItems();
-        }
-
-        // Standard Preview and Navigation
-        function openPreview(url) { previewImg.src = url; previewModal.style.display = "flex"; }
-        function navigateTo(path) { currentPath = path; loadItems(); }
-        
-        async function uploadPhoto() {
-            const input = document.getElementById('photoInput');
-            if (!input.files[0]) return;
-            const fd = new FormData(); fd.append('photo', input.files[0]); fd.append('folder', currentPath);
-            await fetch('/upload', { method: 'POST', body: fd }); loadItems();
-        }
-
-        loadItems(); // Muat item saat halaman dibuka
-    </script>
+    loadItems();
+</script>
 </body>
 </html>
