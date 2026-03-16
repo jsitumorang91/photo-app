@@ -1,198 +1,123 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Repo Publik - Modern</title>
+    <title>Photo Repository</title>
     <link rel="icon" type="image/png" href="https://www.google.com/images/branding/product/2x/photos_64dp.png">
     <style>
-        /* Gaya Google Photos Putih Bersih */
-        body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            background-color: #f8f9fa; 
-            text-align: center; 
-        }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #f8f9fa; color: #3c4043; }
+        header { background: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .controls { background: white; padding: 20px; border-bottom: 1px solid #ddd; display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
+        .breadcrumb { padding: 10px 20px; font-size: 14px; color: #1a73e8; cursor: pointer; }
+        
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; padding: 20px; }
+        .item { border-radius: 8px; overflow: hidden; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: 0.2s; cursor: pointer; position: relative; }
+        .item:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .item img { width: 100%; height: 180px; object-fit: cover; display: block; }
+        .item.folder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 180px; background: #e8f0fe; }
+        .folder-icon { font-size: 50px; }
+        .item-name { padding: 8px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Header Gaya Google */
-        header {
-            background-color: rgb(255, 255, 255);
-            color: #5f6368;
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 1px 2px rgba(60,64,67,0.3);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        /* Modal Preview */
+        #previewModal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
+        #previewImg { max-width: 90%; max-height: 90%; border-radius: 4px; }
+        .close { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer; }
 
-        header h2 {
-            margin: 0;
-            font-weight: 400;
-            font-size: 1.5rem;
-        }
-
-        /* Bagian Upload */
-        .upload-section {
-            background-color: white;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(60,64,67,0.1);
-            margin-bottom: 24px;
-        }
-
-        /* Input File & Tombol */
-        #photoInput {
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            padding: 12px;
-            background: #f8f9fa;
-            cursor: pointer;
-            margin-right: 12px;
-            color: #5f6368;
-        }
-
-        button.upload-btn {
-            background-color: #1a73e8; /* Biru Google */
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.2s;
-        }
-
-        button.upload-btn:hover {
-            background-color: #1557b0;
-        }
-
-        /* Grid Galeri yang Luas */
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Gambar lebih besar */
-            gap: 12px;
-            padding: 24px;
-        }
-
-        /* Gambar Galeri */
-        .gallery img {
-            width: 100%;
-            height: 300px;
-            object-fit: cover; /* Crop agar rapi */
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 1px 2px rgba(60,64,67,0.1);
-        }
-
-        /* Efek Hover Gambar */
-        .gallery img:hover {
-            transform: scale(1.03); /* Membesar sedikit */
-            box-shadow: 0 4px 8px rgba(60,64,67,0.2);
-            z-index: 1;
-        }
-
-        /* Gaya Tombol Bawaan Input File (Safari/Chrome) */
-        input[type="file"]::-webkit-file-upload-button {
-            border: none;
-            background: none;
-            color: #1a73e8;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        /* Gaya untuk status loading */
-        #uploadStatus {
-            margin-top: 8px;
-            color: #5f6368;
-            font-size: 0.9rem;
-        }
+        button { padding: 10px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; }
+        .btn-upload { background: #1a73e8; color: white; }
+        .btn-folder { background: #f1f3f4; color: #3c4043; border: 1px solid #dadce0; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h2>My Photo Repository</h2>
-        <img src="https://www.google.com/images/branding/product/2x/photos_96dp.png" alt="Google Photos" height="32px">
-    </header>
-
-    <div class="upload-section">
-        <h2>Tambahkan Foto Baru</h2>
-        <input type="file" id="photoInput" accept="image/*">
-        <button onclick="uploadPhoto()" class="upload-btn">Upload Foto</button>
-        <p id="uploadStatus"></p>
+<header>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="https://www.google.com/images/branding/product/2x/photos_96dp.png" height="32">
+        <h2 style="margin:0; font-weight: 400;">Photos</h2>
     </div>
+</header>
 
-    <div class="gallery" id="gallery"></div>
+<div class="controls">
+    <input type="file" id="photoInput" accept="image/*">
+    <button class="btn-upload" onclick="uploadPhoto()">Upload Photo</button>
+    <button class="btn-folder" onclick="createNewFolder()">+ New Folder</button>
+</div>
 
-    <script>
-        const gallery = document.getElementById('gallery');
-        const uploadStatus = document.getElementById('uploadStatus');
+<div class="breadcrumb" onclick="navigateTo('')">Home <span id="currentPathDisplay"></span></div>
 
-        // Mengambil foto menggunakan URL Relatif agar kompatibel di internet
-        async function loadPhotos() {
-            try {
-                const res = await fetch('/photos'); // Memanggil endpoint backend
-                const data = await res.json();
-                
-                if (!data.length) {
-                    gallery.innerHTML = "<p style='color: #5f6368; font-style: italic;'>Galeri kosong. Coba upload foto!</p>";
-                    return;
-                }
+<div class="gallery" id="gallery"></div>
 
-                gallery.innerHTML = data.map(p => `
-                    <img src="${p.url}" alt="Foto Galeri" title="Klik untuk memperbesar">
-                `).join('');
+<div id="previewModal">
+    <span class="close" onclick="closePreview()">&times;</span>
+    <img id="previewImg">
+</div>
 
-                // Opsional: Tambahkan lightbox atau fungsi zoom di sini
-            } catch (err) {
-                console.error("Error memuat foto:", err);
-                gallery.innerHTML = "<p style='color: #d93025;'>Gagal memuat galeri. Cek log server.</p>";
+<script>
+    let currentPath = "";
+    const gallery = document.getElementById('gallery');
+
+    async function loadItems() {
+        const res = await fetch(`/items?path=${currentPath}`);
+        const items = await res.json();
+        document.getElementById('currentPathDisplay').innerText = currentPath ? ` / ${currentPath}` : "";
+        
+        gallery.innerHTML = items.map(item => {
+            if (item.isFolder) {
+                return `
+                    <div class="item folder" onclick="navigateTo('${currentPath ? currentPath + '/' : ''}${item.name}')">
+                        <div class="folder-icon">📁</div>
+                        <div class="item-name">${item.name}</div>
+                    </div>`;
+            } else {
+                return `
+                    <div class="item" onclick="openPreview('${item.url}')">
+                        <img src="${item.url}">
+                        <div class="item-name">${item.name}</div>
+                    </div>`;
             }
-        }
+        }).join('');
+    }
 
-        // Fungsi Upload
-        async function uploadPhoto() {
-            const fileInput = document.getElementById('photoInput');
-            
-            if (!fileInput.files[0]) {
-                alert("Pilih file foto terlebih dahulu.");
-                return;
-            }
+    function navigateTo(path) {
+        currentPath = path;
+        loadItems();
+    }
 
-            const formData = new FormData();
-            formData.append('photo', fileInput.files[0]);
+    async function createNewFolder() {
+        const folderName = prompt("Enter folder name:");
+        if (!folderName) return;
+        await fetch('/create-folder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ folderName, currentPath })
+        });
+        loadItems();
+    }
 
-            uploadStatus.innerText = "Mengupload..."; // Tampilkan status
+    async function uploadPhoto() {
+        const fileInput = document.getElementById('photoInput');
+        if (!fileInput.files[0]) return alert("Select a file first");
 
-            try {
-                const response = await fetch('/upload', { method: 'POST', body: formData }); // Memanggil endpoint backend
-                
-                if (!response.ok) {
-                    throw new Error("Pesan dari server: Gagal upload");
-                }
+        const formData = new FormData();
+        formData.append('photo', fileInput.files[0]);
+        formData.append('folder', currentPath);
 
-                uploadStatus.innerText = "Berhasil diupload!";
-                uploadStatus.style.color = "#188038";
-                fileInput.value = ''; // Reset input
-                loadPhotos(); // Refresh galeri
+        await fetch('/upload', { method: 'POST', body: formData });
+        fileInput.value = '';
+        loadItems();
+    }
 
-                // Hapus status setelah beberapa detik
-                setTimeout(() => {
-                    uploadStatus.innerText = "";
-                    uploadStatus.style.color = "#5f6368";
-                }, 3000);
+    function openPreview(url) {
+        document.getElementById('previewImg').src = url;
+        document.getElementById('previewModal').style.display = "flex";
+    }
 
-            } catch (err) {
-                alert(err.message || "Upload gagal.");
-                uploadStatus.innerText = "";
-            }
-        }
+    function closePreview() {
+        document.getElementById('previewModal').style.display = "none";
+    }
 
-        loadPhotos();
-    </script>
+    loadItems();
+</script>
 </body>
 </html>

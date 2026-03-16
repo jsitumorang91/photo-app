@@ -6,35 +6,54 @@ const fs = require('fs');
 
 const app = express();
 app.use(cors());
-app.use(express.static('public')); // Melayani file HTML dari folder public
-app.use('/uploads', express.static('uploads')); // Melayani file foto
+app.use(express.json());
+app.use(express.static('public'));
+app.use('/uploads', express.static('uploads'));
+
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR);
 
 const storage = multer.diskStorage({
-    destination: './uploads/',
+    destination: (req, file, cb) => {
+        const targetPath = path.join(UPLOADS_DIR, req.body.folder || '');
+        cb(null, targetPath);
+    },
     filename: (req, file, cb) => {
         cb(null, Date.now() + path.extname(file.originalname));
     }
 });
-
 const upload = multer({ storage: storage });
 
-// Endpoint Upload - Menggunakan path relatif
-app.post('/upload', upload.single('photo'), (req, res) => {
-    if (!req.file) return res.status(400).send("Gagal upload");
-    res.json({ url: `/uploads/${req.file.filename}` });
+// 1. Create New Folder
+app.post('/create-folder', (req, res) => {
+    const { folderName, currentPath } = req.body;
+    const newPath = path.join(UPLOADS_DIR, currentPath || '', folderName);
+    if (!fs.existsSync(newPath)) {
+        fs.mkdirSync(newPath, { recursive: true });
+        res.json({ success: true });
+    } else {
+        res.status(400).json({ error: "Folder already exists" });
+    }
 });
 
-// Endpoint Ambil Foto - Menggunakan path relatif
-app.get('/photos', (req, res) => {
-    const directoryPath = path.join(__dirname, 'uploads');
-    if (!fs.existsSync(directoryPath)) fs.mkdirSync(directoryPath);
+// 2. Upload Photo to specific folder
+app.post('/upload', upload.single('photo'), (req, res) => {
+    res.json({ success: true });
+});
 
-    fs.readdir(directoryPath, (err, files) => {
-        if (err) return res.status(500).send("Gagal membaca folder");
-        const fileInfos = files
-            .filter(file => !file.startsWith('.'))
-            .map(file => ({ url: `/uploads/${file}` }));
-        res.json(fileInfos);
+// 3. Get Items (Files & Folders)
+app.get('/items', (req, res) => {
+    const subFolder = req.query.path || '';
+    const directoryPath = path.join(UPLOADS_DIR, subFolder);
+    
+    fs.readdir(directoryPath, { withFileTypes: true }, (err, files) => {
+        if (err) return res.status(500).send("Unable to scan directory");
+        const items = files.map(file => ({
+            name: file.name,
+            isFolder: file.isDirectory(),
+            url: file.isDirectory() ? null : `/uploads/${subFolder ? subFolder + '/' : ''}${file.name}`
+        }));
+        res.json(items);
     });
 });
 
