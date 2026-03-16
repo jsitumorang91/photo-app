@@ -7,45 +7,44 @@ const fs = require('fs');
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
-app.use('/uploads', express.static('uploads'));
+
+// Critical Fix: Server static files from 'public' for the frontend
+app.use(express.static(path.join(__dirname, 'public'))); 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR);
 
-// Fungsi Upload yang dinamis (bisa upload ke folder tertentu)
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const targetPath = path.join(UPLOADS_DIR, req.body.folder || '');
-        cb(null, targetPath);
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
+// --- NEW HELPER: Recursive function to get all sub-folders for selection ---
+const getAllFolders = (dir, rootDir, folderList = []) => {
+    const files = fs.readdirSync(dir, { withFileTypes: true });
+    files.forEach(file => {
+        if (file.isDirectory() && !file.name.startsWith('.')) {
+            const fullPath = path.join(dir, file.name);
+            const relativePath = path.relative(rootDir, fullPath);
+            folderList.push({ name: file.name, path: relativePath });
+            getAllFolders(fullPath, rootDir, folderList);
+        }
+    });
+    return folderList;
+};
+
+// --- NEW ENDPOINT: Get list of all folders for Move/Copy destination ---
+app.get('/get-all-folders', (req, res) => {
+    try {
+        const folders = getAllFolders(UPLOADS_DIR, UPLOADS_DIR);
+        // Add option to move to root
+        folders.unshift({ name: "Home (Root)", path: "" }); 
+        res.json(folders);
+    } catch (err) {
+        res.status(500).send("Error scanning folders");
     }
 });
-const upload = multer({ storage: storage });
 
-// API: Ambil daftar file & folder berdasarkan path
-app.get('/items', (req, res) => {
-    const subFolder = req.query.path || '';
-    const directoryPath = path.join(UPLOADS_DIR, subFolder);
-    
-    fs.readdir(directoryPath, { withFileTypes: true }, (err, files) => {
-        if (err) return res.status(500).send("Gagal scan folder");
-        
-        const items = files
-            .filter(file => !file.name.startsWith('.')) // Sembunyikan .gitkeep
-            .map(file => ({
-                name: file.name,
-                isFolder: file.isDirectory(),
-                url: file.isDirectory() ? null : `/uploads/${subFolder ? subFolder + '/' : ''}${file.name}`,
-                path: subFolder ? `${subFolder}/${file.name}` : file.name
-            }));
-        res.json(items);
-    });
-});
 
-// API: Buat Folder Baru
+// --- FILE MANAGEMENT LOGIC ---
+
+// Create Folder (Existing, but re-verified)
 app.post('/create-folder', (req, res) => {
     const { folderName, currentPath } = req.body;
     const newPath = path.join(UPLOADS_DIR, currentPath || '', folderName);
@@ -53,40 +52,93 @@ app.post('/create-folder', (req, res) => {
         fs.mkdirSync(newPath, { recursive: true });
         res.json({ success: true });
     } else {
-        res.status(400).json({ error: "Folder sudah ada" });
+        res.status(400).json({ error: "Folder already exists" });
     }
 });
 
-// API: Move / Copy Item
-app.post('/transfer-item', (req, res) => {
-    const { action, sourcePath, destinationPath } = req.body;
-    const oldFullPath = path.join(UPLOADS_DIR, sourcePath);
-    const fileName = path.basename(sourcePath);
-    const newFullPath = path.join(UPLOADS_DIR, destinationPath, fileName);
+// Rename Item (Handles files with extensions correctly)
+app.post('/rename', (req, res) => {
+    const { oldPath, newName } = req.body;
+    const source = path.join(UPLOADS_DIR, oldPath);
+    
+    if (!fs.existsSync(source)) return res.status(404).json({ error: "Item not found" });
+
+    const isDir = fs.lstatSync(source).isDirectory();
+    const directory = path.dirname(source);
+    
+    // Fix: Preserve file extension if it's a file
+    const extension = isDir ? "" : path.extname(oldPath); 
+    const destination = path.join(directory, newName + extension);
+
+    if (fs.existsSync(destination)) {
+        return res.status(400).json({ error: "Item with that name already exists" });
+    }
 
     try {
-        if (action === 'move') {
-            fs.renameSync(oldFullPath, newFullPath);
-        } else if (action === 'copy') {
-            fs.copyFileSync(oldFullPath, path.join(UPLOADS_DIR, destinationPath, "copy_" + fileName));
-        }
+        fs.renameSync(source, destination);
         res.json({ success: true });
-    } catch (err) {
-        res.status(500).json({ error: "Gagal memproses file" });
-    }
+    } catch (err) { res.status(500).send("Rename failed"); }
 });
 
-// API: Hapus Item
+// Copy Item
+app.post('/copy-item', (req, res) => {
+    const { sourcePath, destinationFolder } = req.body;
+    const oldPath = path.join(UPLOADS_DIR, sourcePath);
+    const newPath = path.join(UPLOADS_DIR, destinationFolder, "copy_" + path.basename(sourcePath));
+    
+    if (!fs.existsSync(oldPath)) return res.status(404).send("Source not found");
+    
+    try {
+        fs.copyFileSync(oldPath, newPath);
+        res.json({ success: true });
+    } catch (err) { res.status(500).send("Copy failed"); }
+});
+
+// Move Item
+app.post('/move-item', (req, res) => {
+    const { sourcePath, destinationFolder } = req.body;
+    const oldPath = path.join(UPLOADS_DIR, sourcePath);
+    const newPath = path.join(UPLOADS_DIR, destinationFolder, path.basename(sourcePath));
+    
+    if (!fs.existsSync(oldPath)) return res.status(404).send("Source not found");
+    if (fs.existsSync(newPath)) return res.status(400).send("Item already exists at destination");
+
+    try {
+        fs.renameSync(oldPath, newPath);
+        res.json({ success: true });
+    } catch (err) { res.status(500).send("Move failed"); }
+});
+
+// Standard Upload, Delete, and Get Endpoints
+app.post('/upload', multer({ storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, path.join(UPLOADS_DIR, req.body.folder || '')),
+    filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+})}).single('photo'), (req, res) => res.json({ success: true }));
+
 app.delete('/delete', (req, res) => {
     const { itemPath } = req.body;
     const fullPath = path.join(UPLOADS_DIR, itemPath);
     if (fs.existsSync(fullPath)) {
         fs.lstatSync(fullPath).isDirectory() ? fs.rmSync(fullPath, { recursive: true }) : fs.unlinkSync(fullPath);
         res.json({ success: true });
-    } else { res.status(404).send("Item tidak ditemukan"); }
+    } else { res.status(404).send("Not found"); }
 });
 
-app.post('/upload', upload.single('photo'), (req, res) => res.json({ success: true }));
+app.get('/items', (req, res) => {
+    const subFolder = req.query.path || '';
+    const dir = path.join(UPLOADS_DIR, subFolder);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+    fs.readdir(dir, { withFileTypes: true }, (err, files) => {
+        if (err) return res.status(500).send("Error");
+        const items = files.filter(f => !f.name.startsWith('.')).map(f => ({
+            name: f.name,
+            isFolder: f.isDirectory(),
+            url: f.isDirectory() ? null : `/uploads/${subFolder ? subFolder + '/' : ''}${f.name}`,
+            path: subFolder ? `${subFolder}/${f.name}` : f.name // Crucial path relative to uploads
+        }));
+        res.json(items);
+    });
+});
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server berjalan di port ${PORT}`));
+app.listen(PORT, () => console.log(`BITbyBIT Server active on ${PORT}`));

@@ -3,66 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BITbyBIT Photo Manager - Neon Edition</title>
-    <link rel="icon" type="image/png" href="https://www.google.com/images/branding/product/2x/photos_64dp.png">
-    
+    <title>Photo Repo Pro - Neon Edition</title>
     <style>
-        /* --- ESTETIKA NEON LIGHT BARU --- */
+        /* --- ESTETIKA NEON LIGHT BARU DENGAN GAMBAR BELAKANG --- */
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            font-family: 'Segoe UI', sans-serif; 
             margin: 0; 
             padding: 0; 
-            
-            /* Ganti Background ke Gambar BITbyBIT & Tambahkan Gradasi Gelap */
-            background: linear-gradient(135deg, rgba(10, 10, 15, 0.9) 0%, rgba(15, 15, 20, 0.95) 100%), 
-                        url('https://image.onrender.com/jsitumorang91/photo-app/image_f42b88.png') no-repeat center center fixed; 
+            /* Integrasi Gambar Latar Belakang BITbyBIT */
+            background: linear-gradient(rgba(15, 32, 39, 0.8), rgba(44, 83, 100, 0.9)), url('https://image.onrender.com/jsitumorang91/photo-app/image_f42b88.png') no-repeat center center fixed; 
             background-size: cover;
-            
             color: #fff;
             min-height: 100vh;
         }
 
         /* Header Gaya Neon (Transparan & Cahaya) */
         header {
-            background-color: rgba(20, 20, 25, 0.8);
-            backdrop-filter: blur(5px); /* Efek Kaca Blur */
+            background-color: rgba(20, 20, 25, 0.05); 
+            backdrop-filter: blur(5px);
             padding: 12px 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-bottom: 2px solid #a6e22e; /* Hijau BITbyBIT */
+            border-bottom: 2px solid #8cc63f; /* Hijau BITbyBIT */
             
             /* Cahaya Neon Hijau pada Header */
-            box-shadow: 0 0 15px rgba(166, 226, 46, 0.6); 
-            
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            box-shadow: 0 0 15px rgba(140, 198, 63, 0.6); 
+            position: sticky; top: 0; z-index: 100;
         }
 
         header h2 {
-            margin: 0;
-            font-weight: 500;
-            font-size: 1.6rem;
-            color: #a6e22e; /* Hijau BITbyBIT */
-            
+            margin: 0; font-weight: 500; font-size: 1.6rem;
+            color: #fff;
             /* Cahaya Neon pada Teks */
-            text-shadow: 0 0 5px rgba(166, 226, 46, 0.9), 0 0 10px rgba(166, 226, 46, 0.7); 
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.9), 0 0 10px rgba(140, 198, 63, 0.7); 
         }
 
         /* Bagian Kontrol (Upload & Folder) */
         .controls {
             padding: 24px;
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
+            display: flex; gap: 12px;
+            justify-content: center; align-items: center; flex-wrap: wrap;
         }
 
-        /* Input File Gaya Neon */
+        /* Input File Modern */
         #photoInput {
-            border: 2px solid rgba(166, 226, 46, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             padding: 12px;
             background: rgba(20, 20, 25, 0.6);
@@ -72,122 +58,143 @@
         }
 
         #photoInput:hover {
-            border-color: #a6e22e;
-            box-shadow: 0 0 10px rgba(166, 226, 46, 0.5);
+            border-color: #8cc63f;
+            box-shadow: 0 0 10px rgba(140, 198, 63, 0.5);
         }
 
-        /* Tombol Gaya Neon Hijau */
+        /* Tombol Gaya Neon */
         button {
-            border: none;
-            padding: 14px 28px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            border: none; padding: 14px 28px; border-radius: 8px;
+            cursor: pointer; font-size: 1rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1px;
             transition: all 0.3s ease;
-            
-            /* Warna Dasar Neon */
-            background-color: #a6e22e; 
-            color: #000;
-            box-shadow: 0 0 5px rgba(166, 226, 46, 0.4);
+            background-color: #f1f3f4; /* Putih */
+            color: #5f6368;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
         }
 
         button:hover {
-            background-color: #bdf25e; /* Hijau lebih cerah saat hover */
-            
-            /* Cahaya Neon Lebih Kuat saat Hover */
-            box-shadow: 0 0 15px rgba(166, 226, 46, 0.9), 0 0 25px rgba(166, 226, 46, 0.7); 
+            background-color: #fff; 
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 25px rgba(140, 198, 63, 0.5); 
             transform: translateY(-2px);
+        }
+
+        button.btn-neon {
+            background-color: #8cc63f; /* Hijau BITbyBIT */
+            color: #000;
+        }
+
+        button.btn-neon:hover {
+            background-color: #ade84f;
+            box-shadow: 0 0 15px rgba(140, 198, 63, 0.9), 0 0 25px rgba(140, 198, 63, 0.7); 
         }
 
         /* Navigasi (Breadcrumb) - Neon Teal */
         .breadcrumb {
-            padding: 10px 24px;
-            font-size: 1rem;
-            color: #66d9ef; /* Teal Neon */
-            cursor: pointer;
-            text-align: center;
-            text-shadow: 0 0 5px rgba(102, 217, 239, 0.8);
+            padding: 10px 24px; font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer; text-align: center;
         }
 
         /* Grid Galeri yang Luas */
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px; padding: 24px;
         }
 
         /* Item Galeri (Efek Kaca Gelap) */
         .item {
-            background-color: rgba(25, 25, 30, 0.7);
-            backdrop-filter: blur(3px); /* Efek Kaca Ringan */
-            border: 1px solid rgba(166, 226, 46, 0.1);
-            border-radius: 12px;
+            background-color: rgba(25, 25, 30, 0.1); 
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
             overflow: hidden;
-            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
             cursor: pointer;
+            position: relative;
         }
 
         .item:hover {
-            transform: scale(1.03) translateY(-5px);
-            
-            /* Neon Border & Glow saat Hover */
-            border-color: rgba(166, 226, 46, 0.6); 
-            box-shadow: 0 5px 15px rgba(166, 226, 46, 0.3), 0 0 25px rgba(166, 226, 46, 0.2); 
+            transform: scale(1.03) translateY(-3px);
+            border-color: rgba(140, 198, 63, 0.5); 
+            box-shadow: 0 5px 15px rgba(140, 198, 63, 0.3), 0 0 25px rgba(140, 198, 63, 0.2); 
         }
 
         /* Gambar */
         .item img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
+            width: 100%; height: 200px; object-fit: cover;
         }
 
-        /* Box Folder (Gaya Neon Cyberpunk) */
+        /* Box Folder (Gradasi Lime/Teal dari Logo) */
         .item.folder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 250px;
-            
-            /* Gradasi Ungu/Biru Cyberpunk */
-            background: linear-gradient(135deg, rgba(30, 30, 40, 0.6) 0%, rgba(40, 30, 50, 0.8) 100%); 
-            color: #66d9ef; /* Teal Neon */
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(140, 198, 63, 0.3) 0%, rgba(0, 150, 136, 0.3) 100%); 
+            color: #fff;
         }
 
-        .folder-icon {
-            font-size: 70px;
-            /* Neon Glow pada Ikon Folder */
-            text-shadow: 0 0 10px rgba(102, 217, 239, 0.9), 0 0 20px rgba(102, 217, 239, 0.7); 
-        }
+        .folder-icon { font-size: 60px; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
 
         /* Informasi Item (Nama Teks) */
         .item-name {
-            padding: 15px;
-            font-size: 0.95rem;
-            text-align: center;
-            font-weight: 500;
+            padding: 10px; font-size: 0.9rem; text-align: center; font-weight: 500;
             color: rgba(255, 255, 255, 0.9);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            background: rgba(0, 0, 0, 0.4);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            background: rgba(0, 0, 0, 0.3);
         }
+
+        /* --- NEW: Menu Aksi Item (Rename/Delete/Copy/Move) --- */
+        .item-actions {
+            position: absolute; bottom: 35px; right: 5px;
+            display: flex; gap: 3px;
+            opacity: 0; /* Sembunyikan default */
+            transition: opacity 0.2s;
+        }
+
+        .item:hover .item-actions { opacity: 1; }
+
+        .btn-mini {
+            font-size: 10px; padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #dadce0; border-radius: 4px;
+            cursor: pointer; color: #3c4043;
+        }
+
+        .btn-mini:hover { background: #fff; }
+        .btn-delete { color: #d93025; }
+
+        /* Panel Menempel/Batal (Neon Lime) */
+        #pasteBar {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(140, 198, 63, 0.9); 
+            backdrop-filter: blur(10px);
+            color: #000; padding: 15px 30px;
+            border-radius: 30px; display: none; gap: 20px;
+            align-items: center; font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 200;
+        }
+
+        /* Modal Preview Gambar (Lightbox) */
+        #previewModal {
+            display: none; position: fixed; z-index: 1000;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            align-items: center; justify-content: center;
+        }
+
+        #previewModal img { max-width: 95%; max-height: 95%; border: 3px solid #fff; border-radius: 4px; }
     </style>
 </head>
 <body>
 
     <header>
-        <h2>BITbyBIT Photo Manager</h2>
+        <h2>BITbyBIT Photo Manager Pro</h2>
     </header>
 
     <div class="controls">
         <input type="file" id="photoInput" accept="image/*">
-        <button onclick="uploadPhoto()">Upload</button>
+        <button onclick="uploadPhoto()" class="btn-neon">Upload Photo</button>
         <button onclick="createNewFolder()">+ Folder Baru</button>
     </div>
 
@@ -195,67 +202,142 @@
 
     <div class="gallery" id="gallery"></div>
 
+    <div id="pasteBar">
+        <span id="clipInfo"></span>
+        <button onclick="executePaste()" class="btn-neon" style="color:#fff; padding: 8px 15px; text-transform: none; border-radius: 15px;">Paste Di Sini</button>
+        <button onclick="clearClipboard()" style="background:none; border:none; color:#000; cursor:pointer;">Cancel</button>
+    </div>
+
+    <div id="previewModal" onclick="this.style.display='none'">
+        <img id="previewImg" src="">
+    </div>
+
     <script>
-        // Logika JavaScript tetap sama persis, hanya tampilan yang berubah
         const gallery = document.getElementById('gallery');
         const pathLabel = document.getElementById('currentPathLabel');
+        const pasteBar = document.getElementById('pasteBar');
+        const clipInfo = document.getElementById('clipInfo');
+        const previewModal = document.getElementById('previewModal');
+        const previewImg = document.getElementById('previewImg');
+
         let currentPath = "";
+        let clipboard = { action: null, sourcePath: null, name: "" }; // Menyimpan data copy/cut
 
         async function loadItems() {
             try {
-                const res = await fetch(`/items?path=${currentPath}`); // Path relatif
+                const res = await fetch(`/items?path=${currentPath}`); // Menggunakan path relatif
                 const items = await res.json();
                 pathLabel.innerText = currentPath;
                 
                 if (!items.length) {
-                    gallery.innerHTML = "<p style='text-align:center; color: #fff; opacity: 0.6; font-style: italic; width: 100%;'>Galeri kosong. Coba upload foto atau buat folder!</p>";
+                    gallery.innerHTML = "<p style='text-align:center; color: #fff; opacity: 0.6; font-style: italic; width: 100%;'>Gallery empty. Upload a photo or create a folder!</p>";
                     return;
                 }
 
-                gallery.innerHTML = items.map(item => {
-                    if (item.isFolder) {
-                        return `
-                            <div class="item folder" onclick="navigateTo('${currentPath ? currentPath + '/' : ''}${item.name}')">
-                                <div class="folder-icon">📁</div>
-                                <div class="item-name">${item.name}</div>
-                            </div>`;
-                    } else {
-                        return `
-                            <div class="item">
-                                <img src="${item.url}" alt="${item.name}">
-                                <div class="item-name">${item.name}</div>
-                            </div>`;
-                    }
-                }).join('');
-            } catch (err) { console.error("Error memuat item:", err); }
+                gallery.innerHTML = items.map(item => `
+                    <div class="item">
+                        <div class="item-actions">
+                            <button class="btn-mini" onclick="renameItem(event, '${item.path}', '${item.name}')">Rename</button>
+                            <button class="btn-mini btn-delete" onclick="deleteItem(event, '${item.path}')">🗑</button>
+                            ${!item.isFolder ? `
+                                <button class="btn-mini" onclick="prepareClip(event, 'copy', '${item.path}', '${item.name}')">Copy</button>
+                                <button class="btn-mini" onclick="prepareClip(event, 'move', '${item.path}', '${item.name}')">Move</button>
+                            ` : ''}
+                        </div>
+
+                        <div onclick="${item.isFolder ? `MapsTo('${item.path}')` : `openPreview('${item.url}')`}">
+                            ${item.isFolder ? '<div class="folder-box folder-icon">📁</div>' : `<img src="${item.url}" alt="${item.name}">`}
+                            <div class="item-name">${item.name}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) { console.error("Error:", err); }
         }
 
-        function navigateTo(path) { currentPath = path; loadItems(); }
+        // --- NEW: Copy & Paste / Move Logic (Frontend Support) ---
+
+        // Prepare Action (Move item data to clipboard)
+        function prepareClip(event, action, path, name) {
+            event.stopPropagation(); // Mencegah preview
+            clipboard = { action, sourcePath: path, name };
+            pasteBar.style.display = 'flex';
+            clipInfo.innerText = `${action.toUpperCase()}ING: ${name}`;
+        }
+
+        async function executePaste() {
+            const endpoint = clipboard.action === 'copy' ? '/copy-item' : '/move-item';
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        sourcePath: clipboard.sourcePath, 
+                        destinationFolder: currentPath // Tempel ke folder saat ini
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Pesan dari server: Gagal ${clipboard.action}`);
+                }
+                
+                clearClipboard();
+                loadItems();
+            } catch (err) { alert(err.message || "Aksi gagal."); }
+        }
+
+        function clearClipboard() {
+            clipboard = { action: null, sourcePath: null, name: "" };
+            pasteBar.style.display = 'none';
+        }
+
+
+        // --- FILE MANAGEMENT FUNCTIONS (FIXED BACKEND SUPPORT) ---
 
         async function createNewFolder() {
-            const folderName = prompt("Masukkan nama folder baru:");
-            if (!folderName) return;
-            try {
+            const name = prompt("Nama folder baru:");
+            if (name) {
                 await fetch('/create-folder', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ folderName, currentPath })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ folderName: name, currentPath })
                 });
                 loadItems();
-            } catch (err) { alert("Gagal membuat folder"); }
+            }
         }
 
+        // Rename (Fixed: Handles extensions correctly on backend)
+        async function renameItem(event, oldPath, oldName) {
+            event.stopPropagation(); // Prevent preview/open
+            const newName = prompt("Masukkan nama baru (tanpa ekstensi):", oldName.split('.').slice(0, -1).join('.'));
+            if (!newName) return;
+            await fetch('/rename', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ oldPath, newName })
+            });
+            loadItems();
+        }
+
+        async function deleteItem(event, itemPath) {
+            event.stopPropagation();
+            if (!confirm("Apakah Anda yakin ingin menghapus item ini?")) return;
+            await fetch('/delete', {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ itemPath })
+            });
+            loadItems();
+        }
+
+        // Standard Preview and Navigation
+        function openPreview(url) { previewImg.src = url; previewModal.style.display = "flex"; }
+        function navigateTo(path) { currentPath = path; loadItems(); }
+        
         async function uploadPhoto() {
-            const fileInput = document.getElementById('photoInput');
-            if (!fileInput.files[0]) return alert("Pilih foto terlebih dahulu.");
-            const formData = new FormData();
-            formData.append('photo', fileInput.files[0]);
-            formData.append('folder', currentPath); // Upload ke folder saat ini
-            try {
-                await fetch('/upload', { method: 'POST', body: formData });
-                fileInput.value = '';
-                loadItems();
-            } catch (err) { alert("Upload gagal"); }
+            const input = document.getElementById('photoInput');
+            if (!input.files[0]) return;
+            const fd = new FormData(); fd.append('photo', input.files[0]); fd.append('folder', currentPath);
+            await fetch('/upload', { method: 'POST', body: fd }); loadItems();
         }
 
         loadItems(); // Muat item saat halaman dibuka
