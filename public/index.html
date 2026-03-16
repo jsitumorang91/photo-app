@@ -2,51 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Photo Repo Pro</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f8f9fa; }
-        header { background: white; padding: 10px 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .controls { background: white; padding: 15px; border-bottom: 1px solid #ddd; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding: 20px; }
-        .item { background: white; border-radius: 8px; overflow: hidden; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; }
-        .item img, .item .folder-box { width: 100%; height: 160px; object-fit: cover; display: block; }
-        .item .folder-box { background: #e8f0fe; display: flex; align-items: center; justify-content: center; font-size: 50px; }
-        .item-info { padding: 8px; font-size: 12px; text-align: center; font-weight: 500; }
-        
-        .delete-btn { position: absolute; top: 5px; left: 5px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 25px; height: 25px; color: red; cursor: pointer; opacity: 0; }
-        .action-menu { position: absolute; top: 5px; right: 5px; display: flex; flex-direction: column; gap: 3px; opacity: 0; }
-        .item:hover .delete-btn, .item:hover .action-menu { opacity: 1; }
-        
-        .btn-action { font-size: 10px; background: white; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; padding: 2px 5px; }
-        .clipboard-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #202124; color: white; padding: 12px 24px; border-radius: 30px; display: none; align-items: center; gap: 20px; z-index: 1000; }
-        #previewModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; align-items:center; justify-content:center; }
-        #previewModal img { max-width: 90%; max-height: 90%; }
+        .controls { background: white; padding: 15px; border-bottom: 1px solid #ddd; display: flex; gap: 10px; justify-content: center; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; padding: 20px; }
+        .item { background: white; border-radius: 8px; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; }
+        .item img, .folder-box { width: 100%; height: 150px; object-fit: cover; }
+        .folder-box { background: #e8f0fe; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+        .action-menu { position: absolute; top: 5px; right: 5px; display: flex; flex-direction: column; gap: 2px; opacity: 0; transition: 0.2s; }
+        .item:hover .action-menu { opacity: 1; }
+        .btn-sm { font-size: 10px; cursor: pointer; border: 1px solid #ccc; background: white; border-radius: 3px; }
+        .clipboard-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #202124; color: white; padding: 10px 20px; border-radius: 20px; display: none; gap: 15px; z-index: 1000; }
     </style>
 </head>
 <body>
 
-<header>
-    <img src="https://www.google.com/images/branding/product/2x/photos_96dp.png" height="32">
-    <h2 style="font-weight: 400; margin: 0;">Photos</h2>
-</header>
-
 <div class="controls">
     <input type="file" id="photoInput">
-    <button onclick="uploadPhoto()" style="background:#1a73e8; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Upload</button>
-    <button onclick="createNewFolder()" style="background:#fff; border:1px solid #dadce0; padding:8px 15px; border-radius:4px; cursor:pointer;">New Folder</button>
+    <button onclick="uploadPhoto()">Upload</button>
+    <button onclick="createNewFolder()">+ Folder</button>
 </div>
 
-<div style="padding:10px 20px; color:#1a73e8; cursor:pointer;" onclick="navigateTo('')">Home / <span id="currentPathLabel"></span></div>
+<div id="pathBar" style="padding:10px 20px; color:#1a73e8; cursor:pointer;" onclick="navigateTo('')">Home / <span id="pathLabel"></span></div>
 <div class="gallery" id="gallery"></div>
 
 <div id="clipboardBar" class="clipboard-bar">
     <span id="clipLabel"></span>
-    <button onclick="pasteItem()" style="background:#8ab4f8; border:none; padding:5px 15px; border-radius:15px; cursor:pointer;">Paste Here</button>
-    <button onclick="clearClipboard()" style="background:none; border:none; color:white; cursor:pointer;">Cancel</button>
+    <button onclick="pasteItem()" style="background:#8ab4f8; border:none; border-radius:10px; padding:2px 10px;">Paste</button>
+    <button onclick="clearClip()" style="background:none; color:white; border:none;">Cancel</button>
 </div>
-
-<div id="previewModal" onclick="this.style.display='none'"><img id="previewImg"></div>
 
 <script>
     let currentPath = "";
@@ -55,20 +40,19 @@
     async function loadItems() {
         const res = await fetch(`/items?path=${currentPath}`);
         const items = await res.json();
-        document.getElementById('currentPathLabel').innerText = currentPath;
+        document.getElementById('pathLabel').innerText = currentPath;
         const gallery = document.getElementById('gallery');
         
         gallery.innerHTML = items.map(item => `
             <div class="item">
-                <button class="delete-btn" onclick="deleteItem(event, '${item.path}')">🗑</button>
                 <div class="action-menu">
-                    <button class="btn-action" onclick="renameItem(event, '${item.path}', '${item.name}')">Rename</button>
-                    <button class="btn-action" onclick="setClip(event, 'copy', '${item.path}', '${item.name}')">Copy</button>
-                    <button class="btn-action" onclick="setClip(event, 'move', '${item.path}', '${item.name}')">Move</button>
+                    <button class="btn-sm" onclick="renameItem(event, '${item.path}', '${item.name}')">Rename</button>
+                    <button class="btn-sm" onclick="setClip(event, 'copy', '${item.path}', '${item.name}')">Copy</button>
+                    <button class="btn-sm" onclick="setClip(event, 'move', '${item.path}', '${item.name}')">Move</button>
                 </div>
-                <div onclick="${item.isFolder ? `MapsTo('${item.path}')` : `openPreview('${item.url}')`}">
+                <div onclick="${item.isFolder ? `MapsTo('${item.path}')` : `window.open('${item.url}')`}">
                     ${item.isFolder ? '<div class="folder-box">📁</div>' : `<img src="${item.url}">`}
-                    <div class="item-info">${item.name}</div>
+                    <div style="padding:5px; font-size:11px; text-align:center;">${item.name}</div>
                 </div>
             </div>
         `).join('');
@@ -76,7 +60,7 @@
 
     async function renameItem(e, oldPath, oldName) {
         e.stopPropagation();
-        const newName = prompt("Enter new name:", oldName.split('.')[0]);
+        const newName = prompt("New name:", oldName.split('.')[0]);
         if (newName) {
             await fetch('/rename', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ oldPath, newName }) });
             loadItems();
@@ -87,24 +71,20 @@
         e.stopPropagation();
         clipboard = { action, path, name };
         document.getElementById('clipboardBar').style.display = "flex";
-        document.getElementById('clipLabel').innerText = `${action.toUpperCase()}ING: ${name}`;
+        document.getElementById('clipLabel').innerText = `${action}: ${name}`;
     }
 
     async function pasteItem() {
         const endpoint = clipboard.action === 'copy' ? '/copy-item' : '/move-item';
         await fetch(endpoint, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ sourcePath: clipboard.path, destinationFolder: currentPath }) });
-        clearClipboard();
+        clearClip();
         loadItems();
     }
 
-    function clearClipboard() { document.getElementById('clipboardBar').style.display = "none"; }
-    async function deleteItem(e, path) { e.stopPropagation(); if (confirm("Delete?")) { await fetch('/delete', { method: 'DELETE', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ itemPath: path }) }); loadItems(); } }
+    function clearClip() { document.getElementById('clipboardBar').style.display = "none"; }
     function navigateTo(p) { currentPath = p; loadItems(); }
-    function openPreview(u) { document.getElementById('previewImg').src = u; document.getElementById('previewModal').style.display = "flex"; }
-    async function createNewFolder() { const name = prompt("Folder name:"); if (name) { await fetch('/create-folder', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ folderName: name, currentPath }) }); loadItems(); } }
     async function uploadPhoto() {
-        const input = document.getElementById('photoInput'); if (!input.files[0]) return;
-        const fd = new FormData(); fd.append('photo', input.files[0]); fd.append('folder', currentPath);
+        const fd = new FormData(); fd.append('photo', document.getElementById('photoInput').files[0]); fd.append('folder', currentPath);
         await fetch('/upload', { method: 'POST', body: fd }); loadItems();
     }
     loadItems();
