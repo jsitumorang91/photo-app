@@ -3,26 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Repository - Neon Gradient</title>
+    <title>BITbyBIT Photo Repository</title>
     <style>
-        /* Gaya Modern dengan Gradasi Menarik */
+        /* Desain Modern Berbasis Gambar Latar Belakang "BITbyBIT" */
         body { 
-            font-family: 'Poppins', sans-serif; 
+            font-family: 'Segoe UI', sans-serif; 
             margin: 0; 
             padding: 0; 
-            /* Gradasi Cyberpunk */
-            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); 
+            /* Integrasi Gambar Latar Belakang */
+            background: linear-gradient(rgba(15, 32, 39, 0.8), rgba(44, 83, 100, 0.9)), url('https://image.onrender.com/jsitumorang91/photo-app/image_f42b88.png') no-repeat center center fixed; 
+            background-size: cover;
             color: #fff;
             min-height: 100vh;
         }
 
+        /* Header Transparan (Efek Kaca) */
         header {
-            background: rgba(255, 255, 255, 0.05); /* Efek Kaca */
+            background: rgba(255, 255, 255, 0.05); 
             backdrop-filter: blur(10px);
-            padding: 16px 30px;
+            padding: 12px 24px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: sticky;
             top: 0;
@@ -31,72 +33,61 @@
 
         header h2 {
             margin: 0;
-            font-weight: 600;
-            font-size: 1.8rem;
-            background: linear-gradient(to right, #00dbde, #fc00ff); /* Teks Gradasi */
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-weight: 500;
+            font-size: 1.6rem;
+            color: rgba(255, 255, 255, 0.9);
         }
+
+        /* Teks Hijau Lime dari Logo BITbyBIT */
+        header h2 span.bit { color: #8cc63f; } 
 
         /* Kontrol */
         .controls {
-            padding: 30px;
+            padding: 24px;
             display: flex;
-            gap: 15px;
+            gap: 12px;
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
         }
 
-        /* Input File */
+        /* Input File Modern */
         #photoInput {
             border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 30px;
-            padding: 10px 20px;
+            border-radius: 20px;
+            padding: 8px 16px;
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
             cursor: pointer;
         }
 
         /* Tombol Modern */
-        button {
+        button.btn-standard {
             border: none;
-            padding: 12px 30px;
-            border-radius: 30px;
+            padding: 10px 24px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 500;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            transition: background-color 0.2s;
+            background-color: #f1f3f4; /* Putih Google */
+            color: #5f6368;
         }
 
-        .btn-upload {
-            background: linear-gradient(to right, #12c2e9, #c471ed, #f64f59); /* Gradasi Tombol */
+        button.btn-standard:hover { background-color: #e8eaed; }
+
+        button.btn-action {
+            background-color: #1a73e8; /* Biru Google */
             color: white;
-            box-shadow: 0 4px 15px rgba(196, 113, 237, 0.4);
         }
 
-        .btn-upload:hover {
-            box-shadow: 0 6px 20px rgba(196, 113, 237, 0.6);
-            transform: translateY(-2px);
-        }
+        button.btn-action:hover { background-color: #1557b0; }
 
-        .btn-folder {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-folder:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Navigasi */
+        /* Navigasi (Breadcrumb) */
         .breadcrumb {
-            padding: 10px 30px;
-            font-size: 1rem;
-            color: #00dbde; /* Biru Neon */
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
             cursor: pointer;
             text-align: center;
         }
@@ -104,133 +95,294 @@
         /* Grid Galeri */
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+            padding: 24px;
         }
 
-        /* Item */
+        /* Item Galeri (Efek Kaca) */
         .item {
-            background: rgba(255, 255, 255, 0.05); /* Efek Kaca */
+            background: rgba(255, 255, 255, 0.05); 
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
+            border-radius: 12px;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
+            position: relative;
         }
 
         .item:hover {
-            transform: translateY(-5px);
-            border-color: rgba(0, 219, 222, 0.5); /* Neon Border */
-            box-shadow: 0 5px 15px rgba(0, 219, 222, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
         /* Gambar */
         .item img {
             width: 100%;
-            height: 220px;
+            height: 200px;
             object-fit: cover;
         }
 
-        /* Box Folder */
+        /* Box Folder (Gradasi Lime/Teal dari Logo) */
         .item.folder {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 220px;
-            background: linear-gradient(135deg, #2b5876 0%, #4e4376 100%); /* Gradasi Folder */
+            height: 200px;
+            background: linear-gradient(135deg, rgba(140, 198, 63, 0.3) 0%, rgba(0, 150, 136, 0.3) 100%); 
             color: #fff;
         }
 
-        .folder-icon {
-            font-size: 70px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
+        .folder-icon { font-size: 50px; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
 
         /* Nama Item */
         .item-name {
-            padding: 15px;
-            font-size: 0.9rem;
+            padding: 10px;
+            font-size: 0.85rem;
             text-align: center;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0,0,0,0.3);
+        }
+
+        /* Tombol Aksi di Item */
+        .item-actions {
+            position: absolute;
+            bottom: 35px; /* Sedikit di atas nama */
+            right: 5px;
+            display: flex;
+            gap: 3px;
+            opacity: 0; /* Sembunyikan saat normal */
+            transition: opacity 0.2s;
+        }
+
+        .item:hover .item-actions { opacity: 1; }
+
+        .btn-item {
+            font-size: 10px;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #3c4043;
+        }
+
+        .btn-delete { color: #d93025; }
+
+        /* --- NEW: Image Preview Modal (Lightbox) --- */
+        #previewModal {
+            display: none; /* Sembunyikan default */
+            position: fixed;
+            z-index: 1000;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            align-items: center; justify-content: center;
+        }
+
+        #previewImg {
+            max-width: 90%;
+            max-height: 90%;
+            border: 3px solid #fff;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .close-preview {
+            position: absolute;
+            top: 20px; right: 30px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Panel Memindahkan/Menyalin */
+        #transferPanel {
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(10px);
+            padding: 10px;
+            border-radius: 10px;
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: none; gap: 10px; align-items: center; z-index: 200;
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <header>
-        <h2>PHOTO REPOSITORY</h2>
-    </header>
+        <h2><span class="bit">BIT</span>by<span class="bit">BIT</span> Photo Repo</h2>
+        </header>
 
     <div class="controls">
         <input type="file" id="photoInput" accept="image/*">
-        <button onclick="uploadPhoto()" class="btn-upload">Upload</button>
-        <button onclick="createNewFolder()" class="btn-folder">+ New Folder</button>
+        <button onclick="uploadPhoto()" class="btn-standard btn-action">Upload Photo</button>
+        <button onclick="createNewFolder()" class="btn-standard">+ New Folder</button>
     </div>
 
-    <div class="breadcrumb" onclick="navigateTo('')">HOME / <span id="currentPathLabel"></span></div>
+    <div class="breadcrumb" onclick="navigateTo('')">Home / <span id="currentPathLabel"></span></div>
 
     <div class="gallery" id="gallery"></div>
 
+    <div id="transferPanel">
+        <span id="transferLabel"></span>
+        <button onclick="pasteItem()" class="btn-standard btn-action">Paste Here</button>
+        <button onclick="clearClipboard()" class="btn-standard">Cancel</button>
+    </div>
+
+    <div id="previewModal">
+        <span class="close-preview" onclick="closePreview()">&times;</span>
+        <img id="previewImg" src="">
+    </div>
+
     <script>
-        // Logika JavaScript sama persis
         const gallery = document.getElementById('gallery');
         const pathLabel = document.getElementById('currentPathLabel');
+        const transferPanel = document.getElementById('transferPanel');
+        const transferLabel = document.getElementById('transferLabel');
+        const previewModal = document.getElementById('previewModal');
+        const previewImg = document.getElementById('previewImg');
+
         let currentPath = "";
+        let clipboard = { action: null, sourcePath: null, fileName: "" }; // Menyimpan data copy/cut
 
         async function loadItems() {
             try {
-                const res = await fetch(`/items?path=${currentPath}`); // Path relatif
+                const res = await fetch(`/items?path=${currentPath}`); // Menggunakan path relatif
                 const items = await res.json();
                 pathLabel.innerText = currentPath;
                 
                 if (!items.length) {
-                    gallery.innerHTML = "<p style='text-align:center; color: #fff; opacity: 0.6; font-style: italic; width: 100%;'>No items here. Upload a photo or create a folder!</p>";
+                    gallery.innerHTML = "<p style='text-align:center; color: #fff; opacity: 0.6; font-style: italic; width: 100%;'>Gallery empty. Upload a photo or create a folder!</p>";
                     return;
                 }
 
-                gallery.innerHTML = items.map(item => {
-                    if (item.isFolder) {
-                        return `
-                            <div class="item folder" onclick="navigateTo('${currentPath ? currentPath + '/' : ''}${item.name}')">
-                                <div class="folder-icon">📁</div>
-                                <div class="item-name">${item.name}</div>
-                            </div>`;
-                    } else {
-                        return `
-                            <div class="item">
-                                <img src="${item.url}" alt="${item.name}">
-                                <div class="item-name">${item.name}</div>
-                            </div>`;
-                    }
-                }).join('');
-            } catch (err) { console.error("Error:", err); }
+                gallery.innerHTML = items.map(item => `
+                    <div class="item ${item.isFolder ? 'folder' : ''}">
+                        <div class="item-actions">
+                            <button class="btn-item" onclick="renameItem(event, '${item.path}', '${item.name}')">Rename</button>
+                            <button class="btn-item" onclick="deleteItem(event, '${item.path}')">🗑</button>
+                            ${!item.isFolder ? `
+                                <button class="btn-item" onclick="prepareTransfer(event, 'copy', '${item.path}', '${item.name}')">Copy</button>
+                                <button class="btn-item" onclick="prepareTransfer(event, 'move', '${item.path}', '${item.name}')">Move</button>
+                            ` : ''}
+                        </div>
+
+                        <div onclick="${item.isFolder ? `MapsTo('${item.path}')` : `openPreview('${item.url}')`}">
+                            ${item.isFolder ? '<div class="folder-icon">📁</div>' : `<img src="${item.url}" alt="${item.name}">`}
+                            <div class="item-name">${item.name}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) { console.error("Error memuat item:", err); }
         }
 
         function navigateTo(path) { currentPath = path; loadItems(); }
 
+        // --- NEW: Fitur Preview (Lightbox) ---
+        function openPreview(url) {
+            previewImg.src = url; // Set sumber gambar
+            previewModal.style.display = "flex"; // Tampilkan modal
+        }
+
+        function closePreview() {
+            previewModal.style.display = "none"; // Sembunyikan modal
+            previewImg.src = ""; // Reset sumber gambar
+        }
+
+        // --- FILE MANAGEMENT FUNCTIONS (FIXED) ---
+
         async function createNewFolder() {
-            const folderName = prompt("Folder name:");
+            const folderName = prompt("Masukkan nama folder baru:");
             if (!folderName) return;
             try {
-                await fetch('/create-folder', {
+                const response = await fetch('/create-folder', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ folderName, currentPath })
                 });
+                
+                if (!response.ok) {
+                    throw new Error("Pesan dari server: Gagal membuat folder");
+                }
                 loadItems();
-            } catch (err) { alert("Failed to create folder"); }
+            } catch (err) { alert(err.message || "Gagal membuat folder."); }
         }
 
+        // Rename (Fixed: Backend handles preserve/remove extension correctly)
+        async function renameItem(event, oldPath, oldName) {
+            event.stopPropagation(); // Jangan buka folder/preview saat mengklik tombol
+            const newName = prompt("Masukkan nama baru (tanpa ekstensi untuk file):", oldName.split('.').slice(0, -1).join('.'));
+            if (!newName) return;
+            try {
+                await fetch('/rename', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ oldPath, newName })
+                });
+                loadItems();
+            } catch (err) { alert("Gagal melakukan rename"); }
+        }
+
+        async function deleteItem(event, itemPath) {
+            event.stopPropagation();
+            if (!confirm("Apakah Anda yakin ingin menghapus item ini?")) return;
+            try {
+                await fetch('/delete', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ itemPath })
+                });
+                loadItems();
+            } catch (err) { alert("Hapus gagal"); }
+        }
+
+        // --- NEW: Copy & Move Logic (Fixed Backend Support) ---
+
+        // Prepare Copy/Move (Pindahkan data ke clipboard)
+        function prepareTransfer(event, action, path, name) {
+            event.stopPropagation();
+            clipboard = { action, sourcePath: path, fileName: name };
+            transferPanel.style.display = "flex";
+            transferLabel.innerText = `${action === 'copy' ? 'Copying' : 'Moving'}: ${name}`;
+        }
+
+        async function pasteItem() {
+            const endpoint = clipboard.action === 'copy' ? '/copy-item' : '/move-item';
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        sourcePath: clipboard.sourcePath, 
+                        destinationFolder: currentPath // Tempel ke folder saat ini
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Pesan dari server: Gagal melakukan ${clipboard.action}`);
+                }
+
+                clearClipboard(); // Reset clipboard
+                loadItems(); // Refresh galeri
+            } catch (err) { alert(err.message || "Aksi gagal."); }
+        }
+
+        function clearClipboard() {
+            clipboard = { action: null, sourcePath: null, fileName: "" };
+            transferPanel.style.display = "none";
+        }
+
+        // Standard Upload Function
         async function uploadPhoto() {
             const fileInput = document.getElementById('photoInput');
-            if (!fileInput.files[0]) return alert("Select a photo first");
+            if (!fileInput.files[0]) return alert("Pilih foto terlebih dahulu.");
             const formData = new FormData();
             formData.append('photo', fileInput.files[0]);
             formData.append('folder', currentPath); // Upload ke folder saat ini
@@ -238,7 +390,7 @@
                 await fetch('/upload', { method: 'POST', body: formData });
                 fileInput.value = '';
                 loadItems();
-            } catch (err) { alert("Upload failed"); }
+            } catch (err) { alert("Upload gagal"); }
         }
 
         loadItems(); // Muat item saat halaman dibuka
